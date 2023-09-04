@@ -1,3 +1,7 @@
+---
+tags: [lexical]
+---
+
 # How to install facebook/lexical in custom repository
 
 - 如何安装任意一个github仓库的子路径到项目中
