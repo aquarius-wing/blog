@@ -39,6 +39,7 @@ const config = {
       ({
         blog: {
           showReadingTime: true,
+          postsPerPage: 'ALL',
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           // editUrl:
@@ -46,6 +47,9 @@ const config = {
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
+        },
+        docs: {
+          sidebarPath: require.resolve('./sidebars.js'),
         },
       }),
     ],
@@ -63,6 +67,12 @@ const config = {
           src: 'img/logo.svg',
         },
         items: [
+          {
+            type: 'docSidebar',
+            sidebarId: 'tutorialSidebar',
+            position: 'left',
+            label: 'Tutorial',
+          },
           {to: '/blog', label: 'Blog', position: 'left'},
           {
             href: 'https://github.com/aquarius-wing',
