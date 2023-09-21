@@ -1,4 +1,6 @@
 ---
+categories:
+    - blog
 tags: [lexical]
 ---
 
@@ -7,6 +9,7 @@ import TabItem from '@theme/TabItem';
 import CN from './cn.md';
 import EN from './en.md';
 
+# how-to-install-facebook-lexical-in-custom-repository
 <Tabs>
   <TabItem value="english" label="English" default>
     <EN/>

@@ -1,10 +1,6 @@
----
-layout: null
----
-
-# How to install facebook/lexical in custom repository
-
-- 如何安装任意一个github仓库的子路径到项目中1
+# 如何通过自定义仓库的形式来安装facebook/lexical
+ 
+- 如何安装任意一个github仓库的子路径到项目中
 - 如何使得[facebook/lexical](https://github.com/facebook/lexical)一整个打包的仓库变成拆分打包
 - 如何自定义任意一个[facebook/lexical](https://github.com/facebook/lexical)的子仓库且只需要import自己自定义的仓库
   在这篇文章中你可以解决以上的问题
@@ -89,10 +85,6 @@ projects.[https://github.com/Super-Chama/gh2npm](https://github.com/Super-Chama/
 
 - facebook/lexical是整体打包的，我们需要改成单个打包的
 - gitpkg是通过vercel serverless function来部署的，不便于本地调试，代码中提供的build命令仅仅限于打包vuepress生成的文档页面
--
-
-通过gitpkg来安装github仓库本质上基于[npm install <tarball url\>](https://docs.npmjs.com/cli/v9/commands/npm-install#description:~:text=npm%20install%20%3Ctarball%20url%3E%3A)
-来实现
+- 通过gitpkg来安装github仓库本质上基于[npm install <tarball url\>](https://docs.npmjs.com/cli/v9/commands/npm-install#description:~:text=npm%20install%20%3Ctarball%20url%3E%3A)来实现
 
 - gh2npm是一个可以将github仓库的子文件夹转换成新的tarball文件的仓库，但是只支持一个层级
-- 

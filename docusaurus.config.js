@@ -61,7 +61,7 @@ const config = {
       // Replace with your project's social card
       image: 'img/docusaurus-social-card.jpg',
       navbar: {
-        title: 'My Site',
+        title: 'Aquarius Wing',
         logo: {
           alt: 'My Site Logo',
           src: 'img/logo.svg',
@@ -69,11 +69,11 @@ const config = {
         items: [
           {
             type: 'docSidebar',
-            sidebarId: 'tutorialSidebar',
+            sidebarId: 'blog',
             position: 'left',
-            label: 'Tutorial',
+            label: 'blog',
           },
-          {to: '/blog', label: 'Blog', position: 'left'},
+          // {to: '/blog', label: 'News', position: 'left'},
           {
             href: 'https://github.com/aquarius-wing',
             label: 'GitHub',
