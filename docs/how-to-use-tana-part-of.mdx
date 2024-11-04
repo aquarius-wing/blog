@@ -1,0 +1,78 @@
+---
+title: 如何使用tana的part of功能实现语义化层级查询
+---
+
+# 如何使用tana的part of功能实现语义化层级查询
+
+效果如下图
+
+![/img/query-builder-interface1.png](/img/query-builder-interface.png)
+
+## 数据层级如下
+
+1. 第一法院 #法院
+    1. 第一法庭 #法庭
+        1. 法官1 #法官
+    2. 第二法庭 #法庭
+        1. 法官2 #法官
+2. 第二法院 #法院
+    1. 第三法庭 #法庭
+        1. 法官3 #法官
+        2. 法官4 #法官
+    2. 第四法庭 #法庭
+
+上面只是一个简单的层级关系
+
+## 具体大纲文本如下
+
+![court](/img/court.png)
+
+可以看到，每一个对象其实都是独立的新的节点，因为这里模拟的是可能每天都会添加新的内容
+
+## tag之间的关联
+
+![court-tag](/img/court-tag.png)
+
+可以看到，法庭这个tag有一个属性是所属法院，它的类型是`options from supertag`
+
+注意你在把某一个属性设置成这个类型的时候，必须得点进属性详情
+
+然后才有设置具体你想要从哪一个supertag中创建选项的功能
+
+这样子就能够实现
+
+![court-option](/img/court-option.png)
+
+## tag底层语义化进行层级查询
+
+要实现查询第一法院下的所有法官，就需要用到Part of这个的功能
+
+官方是这样介绍的: [Part of](https://tana.inc/docs/semantic-function#part-of)
+
+具体设置如下
+
+![option-setting](/img/option-setting.png)
+
+1. 打开`Field has semantic function`
+2. 选择`Part of`
+
+## 万事俱备，开始搜索
+
+我们要搜索的是法官，所以第一个条件是`#法官`
+
+第二个点击是我们要让查询到的法官的属性`所属法庭`它能够是我们指定的第一法院的法庭
+
+<video src="/video/court-search.mp4" controls/>
+
+1. 我们先输入`>所属法庭`，告诉tana我们要匹配的是这个属性
+2. 然后在右侧输入`>COMPONENTS REC`，告诉tana我们进行语义搜索
+3. 最后也是最重要的一步，输入`@第一法院`，告诉tana要匹配的是之前存在过的第一法院
+
+最后点击`Run once`就可以在下方看到结果
+
+![/img/query-builder-interface.png](/img/query-builder-interface.png)
+
+
+
+
+

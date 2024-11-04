@@ -19,8 +19,8 @@ const sidebars = {
     label: 'blog',
     items: [{
       type: 'doc',
-      label: 'how-to-install-facebook-lexical-in-custom-repository',
-      id: 'how-to-install-facebook-lexical-in-custom-repository/index',
+      label: '如何使用tana的part of功能实现语义化层级查询',
+      id: 'how-to-use-tana-part-of',
     }]
   }],
 };
