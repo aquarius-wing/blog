@@ -6,7 +6,7 @@ title: 如何使用tana的part of功能实现语义化层级查询
 
 效果如下图
 
-![/img/query-builder-interface1.png](/img/query-builder-interface.png)
+![query-builder-interface](/img/query-builder-interface.png)
 
 ## 数据层级如下
 
@@ -71,6 +71,21 @@ title: 如何使用tana的part of功能实现语义化层级查询
 最后点击`Run once`就可以在下方看到结果
 
 ![/img/query-builder-interface.png](/img/query-builder-interface.png)
+
+## One more thing
+
+> 来自`🅣Tana讨论群`的@小明
+
+在上面的场景中，我们是明确知道法官可以通过`所属法庭`找到对应的法庭然后找到法院的
+
+但是实际操作中，可能#法官这个标签有很多其他的属性，有没有什么办法可以实现“根据所有属性”去查找这样的关联呢？
+
+答案是使用tana的`link to`功能
+
+设置如下
+
+![/court-search-links-to](/img/court-search-links-to.png)
+
 
 
 
