@@ -1,0 +1,15 @@
+---
+title: Tana的梯子使用
+pubDate: "2024-11-05"
+category: Note Taking Apps
+tags:
+  - tana
+---
+
+tana由于使用了firebase的缘故，我用的某land梯子也是会时常出现加载比较慢的情况，然后我在surge中通过设置网址关键词tana来指向另一个梯子某dog
+
+然后今天发现除了这个还不行，还得加上firebase关键词，因为它会在客户端请求一个`https://tagr-prod-default-rtdb.europe-west1.firebasedatabase.app`的域名
+
+最终效果如下
+
+![surge-tana](~/assets/images/surge-tana.png)
