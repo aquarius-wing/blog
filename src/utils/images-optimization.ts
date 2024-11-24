@@ -225,7 +225,6 @@ export const astroAsseetsOptimizer: ImagesOptimizer = async (
 
   return Promise.all(
     breakpoints.map(async (w: number) => {
-      console.log('image', image);
       
       const result = await getImage({ src: image, width: w, inferSize: true, ...(format ? { format: format } : {}) });
 

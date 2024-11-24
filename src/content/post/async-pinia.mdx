@@ -1,0 +1,239 @@
+---
+title: 快试试使用这种异步管理状态方法
+pubDate: "2024-11-24"
+category: Front-end technology
+image: ~/assets/images/async-pinia.png
+tags:
+  - frontend
+---
+
+## 前言
+本文将展示一个只需要一行代码实现异步获取Reactivity数据，同时有对应的状态、可以await的promise的状态管理方式
+```vue
+<script setup lang="ts">
+const userStore = useUserStore()
+const loaded = ref(false)
+const userProfileResult = userStore.getUserProfile('00001')
+
+</script>
+
+<template>
+  <div v-if="userProfileResult.isReady">
+    <div>名称：{{ userProfileResult.state.name }}</div>
+    <div>性别：{{ userProfileResult.state.gender }}</div>
+  </div>
+</template>
+```
+
+## 版本1
+你是否像如下这样处理数据？
+
+```vue
+<script setup lang="ts">
+const userProfile = ref<UserProfile | null>(null);
+const loaded = ref(false)
+
+async function loadData() {
+  const response = await fetch('https://api.example.com/user');
+  userProfile.value = await response.json();
+  loaded.value = true
+}
+
+onMounted(() => {
+  loadData()
+});
+
+</script>
+```
+
+## 版本2
+这样子当然没有问题，如果多个组件都会使用同一个数据，你就会想到要用pinia store
+```js
+export const useUserStore = defineStore('user', () => {
+    const userProfile = ref<UserProfile | null>(null);
+    const loaded = ref(false)
+
+    async function loadData() {
+        const response = await fetch('https://api.example.com/user');
+        userProfile.value = await response.json();
+        loaded.value = true
+    }
+
+    return {
+        userProfile,
+        loaded,
+        loadData
+    }
+})
+```
+
+## 版本3
+看上去没有问题，全局就一个user，往往是登录的用户。
+
+但是有一天页面需求更加复杂，除了要显示当前用户的信息，还要显示其他用户的信息，这个时候你会使用computed
+```ts
+export const useUserStore = defineStore('user', () => {
+    const userProfileArray = ref<UserProfile[]>([]);
+
+    async function loadData(userId: string) {
+        const response = await fetch('https://api.example.com/user/' + userId);
+        userProfileArray.value.push(await response.json());
+    }
+
+    function getUserProfile(userId: string) {
+        return computed(() => userProfileArray.value.find(user => user.id === userId))
+    }
+
+    return {
+        userProfile,
+        loadData
+    }
+})
+```
+在页面中
+```vue
+<script setup lang="ts">
+const userStore = useUserStore()
+const loaded = ref(false)
+const userProfile = userStore.getUserProfile('00001')
+
+onMounted(async () => {
+  await userStore.loadData('00001')
+  loaded.value = true
+});
+
+</script>
+
+<template>
+  <div v-if="loaded">
+    <div>名称：{{ userProfile.name }}</div>
+    <div>性别：{{ userProfile.gender }}</div>
+  </div>
+</template>
+```
+如此，你在不同的页面，加载相同的、不同的userId，得到的数据都是Reactivity的，而且，你在一个组件的更新，其他组件都会得到更新
+
+## 版本4
+但是你也发现了，有一点不足，就是loadData和getUserProfile很割裂，有没有办法把它们结合在一起呢？
+```ts
+import { useAsyncState } from '@vueuse/core'
+export const useUserStore = defineStore('user', () => {
+    const userProfileMap = reactive<Map<string, UserProfile>(new Map());
+
+    const getUserProfileGetter = (userId: string) : () => {
+        state: UserProfile | undefined
+        isReady: Ref<boolean>
+        isLoading: Ref<boolean>
+        execute: (...args: any) => Promise<any>
+    } => {
+        const userProfile = userProfileMap.get(userId)
+        if (!userProfile) {
+            const { state: fetchedUserProfiles, isReady, isLoading, execute } = useAsyncState(fetch('https://api.example.com/user/' + userId), null, {
+                onSuccess: (fetchedUserProfiles) => {
+                  fetchedUserProfiles.forEach(userProfile => userProfileMap.set(userProfile.id, userProfile))
+                },
+            })
+            return () => {
+                return {
+                  state: userProfileMap.get(userId),
+                  isReady,
+                  isLoading,
+                  execute,
+                }
+            }
+        }
+        return () => {
+            return {
+              state: userProfileMap.get(userId),
+              isReady: ref(true),
+              isLoading: ref(false),
+              execute: () => Promise.resolve(),
+            }
+        }
+    }
+
+    const getUserProfile = (userId: string) => {
+        return computed(getUserProfileGetter(userId))
+    }
+
+    return {
+        getUserProfile,
+    }
+})
+```
+这一个版本更新的有点多，待会我们一个个讲，下面先看看怎么使用
+```vue
+<script setup lang="ts">
+const userStore = useUserStore()
+const loaded = ref(false)
+const userProfileResult = userStore.getUserProfile('00001')
+
+</script>
+
+<template>
+  <div v-if="userProfileResult.isReady">
+    <div>名称：{{ userProfileResult.state.name }}</div>
+    <div>性别：{{ userProfileResult.state.gender }}</div>
+  </div>
+</template>
+```
+这样我们的vue页面简单很多，使用的方式更加简单、规范、优雅
+
+具体怎么实现的呢，我们一个个来看
+
+## 具体讲解
+1. 首先我们既然是要面向全局服务，自然要保证全局相同id的时候，指向的应该是同一个值，所以我们把`userProfileArray`数组转换成了
+```ts
+const userProfileMap = reactive<Map<string, UserProfile>(new Map());
+```
+2. 想要全局是同一个Reactivity的值，那么我们就得用computed
+```ts
+const getUserProfile = (userId: string) => {
+    return computed(userProfileMap.get(userId))
+}
+```
+3. 当我们这里内存中的数据不存在的时候，我们需要异步去获取
+```ts
+const getUserProfile = (userId: string) => {
+    return computed(() => {
+        const userProfile = userProfileMap.get(userId)
+        if (!userProfile) {
+            fetch('https://api.example.com/user/' + userId).then(response => {
+                userProfileMap.set(userId, response.json())
+            })
+        }
+        return userProfile
+    })
+}
+```
+4. 这样做没有什么问题，但是初次加载时外部拿到的数据就是空的，且没有一个loading的状态，所以我们用上了[useAsyncState](https://vueuse.org/core/useAsyncState)
+5. 后面再把getter的部分剥离成单独的函数，因为这样可以在update中复用
+```ts
+const updateUserProfile = async (user: Partial<UserProfile> & { id: string }) => {
+    const userGetter = getUserProfileGetter(user.id)
+    const existingUser = userGetter()
+    await existingUser.execute()
+    if (existingUser) {
+        const updatedUser = { ...existingUser.state, ...user }
+        userProfileMap.set(user.id, updatedUser)
+        await fetch('https://api.example.com/user/update/', {
+            method: 'PUT',
+            body: JSON.stringify(updatedUser),
+        })
+    } else {
+        await fetch('https://api.example.com/user/update/', {
+            method: 'PUT',
+            body: JSON.stringify(user),
+        })
+        getUserProfileGetter(user.id)
+    }
+}
+```
+6. 注意这里的execute，因为如果只有state、isReady、isLoading，我们没有对应的异步去等待对应的执行结果完毕，也不能使用“轮询”
+虽然demo中没有明确演示要这样做，但是通过查看类型声明和源码，发现这是一个好的路径
+
+## 结语
+至此我们就完成了在vue组件端，只需要一行代码实现异步获取Reactivity数据，同时有对应的状态、可以await的promise
+
+本文写作仓促，如有错误，欢迎指正
+

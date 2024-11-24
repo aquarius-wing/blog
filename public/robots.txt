@@ -1,2 +1,5 @@
 User-agent: *
 Disallow:
+
+
+Sitemap: https://ceo.meogic.com/sitemap-index.xml
