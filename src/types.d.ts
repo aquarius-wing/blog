@@ -1,5 +1,5 @@
 import type { AstroComponentFactory } from 'astro/runtime/server/index.js';
-import type { HTMLAttributes, ImageMetadata } from 'astro/types';
+import type { HTMLAttributes, ImageMetadata, MarkdownHeading } from 'astro/types';
 
 export interface Post {
   /** A unique ID number that identifies a post. */
@@ -39,6 +39,7 @@ export interface Post {
   /**  */
   Content?: AstroComponentFactory;
   content?: string;
+  headings?: MarkdownHeading[];
 
   /**  */
   readingTime?: number;

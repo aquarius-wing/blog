@@ -19,87 +19,117 @@ const { post, url } = Astro.props;
 ---
 
 <section class="py-8 sm:py-16 lg:py-20 mx-auto">
-  <article>
-    <header
-      class={post.image
-        ? 'intersect-once intersect-quarter motion-safe:md:opacity-0 motion-safe:md:intersect:animate-fade'
-        : 'intersect-once intersect-quarter motion-safe:md:opacity-0 motion-safe:md:intersect:animate-fade'}
-    >
-      <div class="flex justify-between flex-col sm:flex-row max-w-3xl mx-auto mt-0 mb-2 px-4 sm:px-6 sm:items-center">
-        <p>
-          <Icon name="tabler:clock" class="w-4 h-4 inline-block -mt-0.5 dark:text-gray-400" />
-          <time datetime={String(post.publishDate)} class="inline-block">{getFormattedDate(post.publishDate)}</time>
-          {
-            post.author && (
-              <>
-                {' '}
-                · <Icon name="tabler:user" class="w-4 h-4 inline-block -mt-0.5 dark:text-gray-400" />
-                <span class="inline-block">{post.author}</span>
-              </>
-            )
-          }
-          {
-            post.category && (
-              <>
-                {' '}
-                ·{' '}
-                <a class="hover:underline inline-block" href={getPermalink(post.category.slug, 'category')}>
-                  {post.category.title}
-                </a>
-              </>
-            )
-          }
-          {
-            post.readingTime && (
-              <>
-                &nbsp;· <span>{post.readingTime}</span> min read
-              </>
-            )
-          }
+  <div class="mx-auto px-6 sm:px-6 max-w-5xl flex flex-col lg:flex-row gap-10">
+    <article class="lg:w-3/4">
+      <header
+        class={post.image
+          ? 'intersect-once intersect-quarter motion-safe:md:opacity-0 motion-safe:md:intersect:animate-fade'
+          : 'intersect-once intersect-quarter motion-safe:md:opacity-0 motion-safe:md:intersect:animate-fade'}
+      >
+        <div class="flex justify-between flex-col sm:flex-row mt-0 mb-2 sm:items-center">
+          <p>
+            <Icon name="tabler:clock" class="w-4 h-4 inline-block -mt-0.5 dark:text-gray-400" />
+            <time datetime={String(post.publishDate)} class="inline-block">{getFormattedDate(post.publishDate)}</time>
+            {
+              post.author && (
+                <>
+                  {' '}
+                  · <Icon name="tabler:user" class="w-4 h-4 inline-block -mt-0.5 dark:text-gray-400" />
+                  <span class="inline-block">{post.author}</span>
+                </>
+              )
+            }
+            {
+              post.category && (
+                <>
+                  {' '}
+                  ·{' '}
+                  <a class="hover:underline inline-block" href={getPermalink(post.category.slug, 'category')}>
+                    {post.category.title}
+                  </a>
+                </>
+              )
+            }
+            {
+              post.readingTime && (
+                <>
+                  &nbsp;· <span>{post.readingTime}</span> min read
+                </>
+              )
+            }
+          </p>
+        </div>
+
+        <h1
+          class="text-4xl md:text-5xl font-bold leading-tighter tracking-tighter font-heading"
+        >
+          {post.title}
+        </h1>
+        <p
+          class="mt-4 mb-8 text-xl md:text-2xl text-muted dark:text-slate-400 text-justify"
+        >
+          {post.excerpt}
         </p>
+
+        {
+          post.image ? (
+            <Image
+              src={post.image}
+              class="max-w-full mb-6 sm:rounded-md bg-gray-400 dark:bg-slate-700"
+              widths={[400, 900]}
+              sizes="(max-width: 900px) 400px, 900px"
+              alt={post?.excerpt || ''}
+              width={900}
+              height={506}
+              loading="eager"
+              decoding="async"
+            />
+          ) : (
+            <div class="border-t dark:border-slate-700" />
+          )
+        }
+      </header>
+
+      <div
+        class="prose prose-md lg:prose-xl dark:prose-invert dark:prose-headings:text-slate-300 prose-headings:font-heading prose-headings:leading-tighter prose-headings:tracking-tighter prose-headings:font-bold prose-a:text-primary dark:prose-a:text-blue-400 prose-img:rounded-md prose-img:shadow-lg prose-headings:scroll-mt-[80px] prose-li:my-0 prose-img:max-h-[50vh] prose-img:h-auto prose-img:w-auto prose-img:m-0 max-w-none mt-8"
+      >
+        <slot />
       </div>
 
-      <h1
-        class="px-4 sm:px-6 max-w-3xl mx-auto text-4xl md:text-5xl font-bold leading-tighter tracking-tighter font-heading"
-      >
-        {post.title}
-      </h1>
-      <p
-        class="max-w-3xl mx-auto mt-4 mb-8 px-4 sm:px-6 text-xl md:text-2xl text-muted dark:text-slate-400 text-justify"
-      >
-        {post.excerpt}
-      </p>
+      <div class="mt-8 flex justify-between flex-col sm:flex-row">
+        <PostTags tags={post.tags} class="mr-5 rtl:mr-0 rtl:ml-5" />
+        <SocialShare
+          url={url}
+          text={post.title}
+          class="mt-5 sm:mt-1 align-middle text-gray-500 dark:text-slate-600"
+        />
+      </div>
+    </article>
 
-      {
-        post.image ? (
-          <Image
-            src={post.image}
-            class="max-w-full lg:max-w-[900px] mx-auto mb-6 sm:rounded-md bg-gray-400 dark:bg-slate-700"
-            widths={[400, 900]}
-            sizes="(max-width: 900px) 400px, 900px"
-            alt={post?.excerpt || ''}
-            width={900}
-            height={506}
-            loading="eager"
-            decoding="async"
-          />
-        ) : (
-          <div class="max-w-3xl mx-auto px-4 sm:px-6">
-            <div class="border-t dark:border-slate-700" />
+    {
+      post.headings && post.headings.length > 0 && (
+        <aside class="hidden lg:block lg:w-1/4 relative">
+          <div class="sticky top-24 self-start">
+            <h2 class="font-bold uppercase mb-4 text-sm text-gray-900 dark:text-white">Table of Contents</h2>
+            <nav>
+              <ul class="text-sm">
+                {post.headings
+                  .filter((h) => h.depth > 1 && h.depth < 4)
+                  .map((heading) => (
+                    <li class="mb-2">
+                      <a
+                        href={`#${heading.slug}`}
+                        class={`block text-muted hover:text-primary dark:hover:text-blue-400 transition-colors duration-200 ${heading.depth === 3 ? 'pl-4' : ''}`}
+                      >
+                        {heading.text}
+                      </a>
+                    </li>
+                  ))}
+              </ul>
+            </nav>
           </div>
-        )
-      }
-    </header>
-    <div
-      class="mx-auto px-6 sm:px-6 max-w-3xl prose prose-md lg:prose-xl dark:prose-invert dark:prose-headings:text-slate-300 prose-headings:font-heading prose-headings:leading-tighter prose-headings:tracking-tighter prose-headings:font-bold prose-a:text-primary dark:prose-a:text-blue-400 prose-img:rounded-md prose-img:shadow-lg mt-8 prose-headings:scroll-mt-[80px] prose-li:my-0
-      prose-img:max-h-[50vh] prose-img:h-auto prose-img:w-auto
-      "
-    >
-      <slot />
-    </div>
-    <div class="mx-auto px-6 sm:px-6 max-w-3xl mt-8 flex justify-between flex-col sm:flex-row">
-      <PostTags tags={post.tags} class="mr-5 rtl:mr-0 rtl:ml-5" />
-      <SocialShare url={url} text={post.title} class="mt-5 sm:mt-1 align-middle text-gray-500 dark:text-slate-600" />
-    </div>
-  </article>
+        </aside>
+      )
+    }
+  </div>
 </section>
