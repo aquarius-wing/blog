@@ -46,21 +46,30 @@ const metadataDefinition = () =>
     .optional();
 
 const postCollection = defineCollection({
-  schema: z.object({
-    publishDate: z.date().optional(),
-    updateDate: z.date().optional(),
-    draft: z.boolean().optional(),
+  schema: z
+    .object({
+      publishDate: z.date().optional(),
+      pubDate: z.union([z.string(), z.date()]).optional(),
+      updateDate: z.date().optional(),
+      draft: z.boolean().optional(),
 
-    title: z.string(),
-    excerpt: z.string().optional(),
-    image: z.string().optional(),
+      title: z.string(),
+      excerpt: z.string().optional(),
+      image: z.string().optional(),
 
-    category: z.string().optional(),
-    tags: z.array(z.string()).optional(),
-    author: z.string().optional(),
+      category: z.string().optional(),
+      tags: z.array(z.string()).optional(),
+      author: z.string().optional(),
 
-    metadata: metadataDefinition(),
-  }),
+      metadata: metadataDefinition(),
+    })
+    .transform((data) => {
+      const publishDate = data.publishDate || (data.pubDate ? new Date(data.pubDate) : undefined);
+      return {
+        ...data,
+        publishDate,
+      };
+    }),
 });
 
 export const collections = {
