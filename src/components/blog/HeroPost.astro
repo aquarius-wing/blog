@@ -1,0 +1,52 @@
+---
+import type { Post } from '~/types';
+
+export interface Props {
+  post: Post;
+}
+
+const { post } = Astro.props;
+---
+
+<div class="mb-20">
+  <!-- Title & Meta -->
+  <header class="mb-8">
+    <h1 class="text-2xl md:text-3xl font-bold leading-tight tracking-tight mb-4 font-heading dark:text-gray-100">
+      <a href={post.permalink} class="hover:text-primary transition duration-200">
+        {post.title}
+      </a>
+    </h1>
+    <div class="text-muted dark:text-slate-400 flex items-center gap-3 text-sm font-medium">
+      <time datetime={String(post.publishDate)}>{post.publishDate.toISOString().split('T')[0]}</time>
+      {
+        post.category && (
+          <>
+            <span>·</span>
+            <a class="hover:underline" href={post.category.slug}>
+              {post.category.title}
+            </a>
+          </>
+        )
+      }
+    </div>
+  </header>
+
+  <!-- Content Preview with Mask -->
+  <div class="relative">
+    <div class="prose prose-lg dark:prose-invert max-w-none max-h-[500px] overflow-hidden opacity-90 relative z-0">
+      <post.Content />
+    </div>
+
+    <!-- Fade Overlay -->
+    <div
+      class="absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t from-white via-white/90 to-transparent dark:from-[#030620] dark:via-[#030620]/90 flex items-end justify-center pb-8 z-10"
+    >
+      <a
+        href={post.permalink}
+        class="group inline-flex items-center gap-2 px-8 py-3 rounded-full bg-white dark:bg-slate-800 text-primary dark:text-white border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl hover:border-primary/50 dark:hover:border-white/50 transition-all duration-300 transform hover:-translate-y-1"
+      >
+        <span class="font-medium">↓ 继续阅读</span>
+      </a>
+    </div>
+  </div>
+</div>

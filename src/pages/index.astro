@@ -1,26 +1,22 @@
 ---
 import Layout from '~/layouts/PageLayout.astro';
-
+import { findLatestPosts } from '~/utils/blog';
+import GridItem from '~/components/blog/GridItem.astro';
+import HeroPost from '~/components/blog/HeroPost.astro';
 import Hero from '~/components/widgets/Hero.astro';
-import Note from '~/components/widgets/Note.astro';
-import Features from '~/components/widgets/Features.astro';
-import Features2 from '~/components/widgets/Features2.astro';
-import Steps from '~/components/widgets/Steps.astro';
-import Content from '~/components/widgets/Content.astro';
-import BlogLatestPosts from '~/components/widgets/BlogLatestPosts.astro';
-import FAQs from '~/components/widgets/FAQs.astro';
-import Stats from '~/components/widgets/Stats.astro';
-import CallToAction from '~/components/widgets/CallToAction.astro';
 
 const metadata = {
-  title: '逸清的数字花园 — 探索个人知识管理',
+  title: 'YiQing / Blog / Home',
   ignoreTitleTemplate: true,
 };
+
+const count = 4;
+const posts = await findLatestPosts({ count });
+const latestPost = posts[0];
+const previousPosts = posts.slice(1);
 ---
 
 <Layout metadata={metadata}>
-  <!-- Hero Widget ******************* -->
-
   <Hero
   >
     <Fragment slot="title">
@@ -29,20 +25,28 @@ const metadata = {
     </Fragment>
 
     <Fragment slot="subtitle">
-      欢迎来到我的个人网站，这里记录了我的一些想法和笔记。
+      这里我会分享一些AI、Web3等科技博客，欢迎关注
     </Fragment>
   </Hero>
+  <section class="max-w-4xl mx-auto px-4 sm:px-6 py-8 md:py-12 border-t border-gray-200 dark:border-gray-800">
+    
+    <h3 class="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-8">最新文章</h3>
 
-  <!-- Note Widget ******************* -->
 
-  
+    <!-- Hero Section: Latest Post -->
+    {latestPost && <HeroPost post={latestPost} />}
 
-  <!-- HighlightedPosts Widget ******* -->
+    <!-- Divider -->
+    <!-- <hr class="border-gray-200 dark:border-gray-800 mb-12" /> -->
 
-  <BlogLatestPosts
-    title="我的博客的最新内容"
-    information={`
-                `}
-  />
-  
+    <!-- Previous Posts Section -->
+    <div class="pt-8 border-t border-gray-200 dark:border-gray-800">
+      <h3 class="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-8">往期文章</h3>
+      
+      <div class="grid gap-6 row-gap-5 md:grid-cols-2 lg:grid-cols-3">
+        {previousPosts.map((post) => <GridItem post={post} />)}
+      </div>
+    </div>
+
+  </section>
 </Layout>
