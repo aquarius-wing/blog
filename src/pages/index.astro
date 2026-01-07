@@ -1,52 +1,98 @@
 ---
 import Layout from '~/layouts/PageLayout.astro';
 import { findLatestPosts } from '~/utils/blog';
-import GridItem from '~/components/blog/GridItem.astro';
-import HeroPost from '~/components/blog/HeroPost.astro';
-import Hero from '~/components/widgets/Hero.astro';
+import { getPermalink } from '~/utils/permalinks';
+import { getFormattedDate } from '~/utils/utils';
+import Image from '~/components/common/Image.astro';
+import heroImage from '~/assets/images/hero-image.png';
 
 const metadata = {
   title: 'YiQing / Blog / Home',
   ignoreTitleTemplate: true,
 };
 
-const count = 4;
+const count = 20;
 const posts = await findLatestPosts({ count });
-const latestPost = posts[0];
-const previousPosts = posts.slice(1);
 ---
 
 <Layout metadata={metadata}>
-  <Hero
-  >
-    <Fragment slot="title">
-      <span>你好，</span><span class="">我是</span>
-      <span class="text-accent dark:text-white highlight"> 逸清</span>
-    </Fragment>
-
-    <Fragment slot="subtitle">
-      这里我会分享一些AI、Web3等科技博客，欢迎关注
-    </Fragment>
-  </Hero>
-  <section class="max-w-4xl mx-auto px-4 sm:px-6 py-8 md:py-12 border-t border-gray-200 dark:border-gray-800">
+  <section class="max-w-3xl mx-auto px-4 sm:px-6 py-12 md:py-20">
     
-    <h3 class="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-8">最新文章</h3>
-
-
-    <!-- Hero Section: Latest Post -->
-    {latestPost && <HeroPost post={latestPost} />}
-
-    <!-- Divider -->
-    <!-- <hr class="border-gray-200 dark:border-gray-800 mb-12" /> -->
-
-    <!-- Previous Posts Section -->
-    <div class="pt-8 border-t border-gray-200 dark:border-gray-800">
-      <h3 class="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-8">往期文章</h3>
-      
-      <div class="grid gap-6 row-gap-5 md:grid-cols-2 lg:grid-cols-3">
-        {previousPosts.map((post) => <GridItem post={post} />)}
+    <!-- Bio / Header Section -->
+    <header class="mb-8 md:mb-12 flex flex-col md:flex-row items-center gap-8 md:gap-12">
+      <div class="flex-1">
+        <h1 class="text-4xl md:text-5xl font-bold font-heading mb-6 tracking-tight dark:text-gray-100">
+          <span class="text-accent dark:text-white highlight">👋 Welcome to Wing’s Blog</span>
+        </h1>
+        <p class="text-xl text-muted dark:text-slate-400 leading-relaxed">
+          你好，我是逸清。这里我会分享一些AI、Web3等科技博客，欢迎关注。
+        </p>
       </div>
-    </div>
+    </header>
+
+    <!-- Blog Posts List -->
+    <section>
+      <div class="flex items-center justify-between mb-8">
+        <h2 class="text-xs font-bold tracking-widest text-gray-500 uppercase dark:text-gray-400">
+          Latest Posts
+        </h2>
+      </div>
+
+      <ul class="space-y-12">
+        {posts.map((post) => (
+          <li class="group">
+            <div class="flex flex-col md:flex-row gap-6 md:gap-8">
+              {post.image && (
+                <a href={getPermalink(post.permalink, 'post')} class="block w-full md:w-52 shrink-0 self-start">
+                  <Image
+                    src={post.image}
+                    alt={post.title}
+                    class="w-full rounded-lg shadow-md bg-gray-100 dark:bg-slate-700 hover:opacity-90 transition duration-200"
+                    width={400}
+                    aspectRatio="16:9"
+                    loading="lazy"
+                  />
+                </a>
+              )}
+              
+              <div class="flex-1 flex flex-col py-2">
+                <a 
+                  href={getPermalink(post.permalink, 'post')} 
+                  class="text-xl font-bold text-gray-900 dark:text-gray-100 group-hover:text-primary transition duration-200 mb-3"
+                >
+                  {post.title}
+                </a>
+
+                {post.excerpt && (
+                  <p class="text-gray-600 dark:text-slate-400 leading-relaxed line-clamp-3 md:line-clamp-2 mb-4">
+                    {post.excerpt}
+                  </p>
+                )}
+                
+                <div class="mt-auto flex items-center justify-start gap-2 text-sm text-gray-500 dark:text-gray-400">
+                  {post.readingTime && (
+                    <>
+                      <span>{Math.ceil(post.readingTime)} min read</span>
+                    </>
+                  )}
+                  {post.category && (
+                    <>
+                      <span class="text-gray-300 dark:text-gray-700">·</span>
+                      <a href={getPermalink(post.category.slug, 'category')} class="hover:underline hover:text-gray-700 dark:hover:text-gray-300">
+                        {post.category.title}
+                      </a>
+                    </>
+                  )}
+                  <time class="ml-auto" datetime={String(post.publishDate)}>
+                    {getFormattedDate(post.publishDate)}
+                  </time>
+                </div>
+              </div>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </section>
 
   </section>
 </Layout>
